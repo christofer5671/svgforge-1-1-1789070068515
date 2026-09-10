@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SVGForge — Bulk SVG CDN Generator</title><style>:root{--bg:#07070a;--p:#11131a;--l:#272a35;--t:#f5f7fb;--m:#969dab;--a:#8b5cf6;--b:#06b6d4}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#1b1230,#07070a 42%);color:var(--t);font:14px system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1100px;margin:auto;padding:28px 16px 60px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:22px}.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:900;background:linear-gradient(135deg,var(--a),var(--b))}.brand h1{margin:0}.brand p,.sub,.note{color:var(--m)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:linear-gradient(180deg,#13151c,#0d0e13);border:1px solid var(--l);border-radius:20px;padding:20px}.wide{grid-column:1/-1}h2{font-size:16px;margin:0 0 14px}.sub{font-size:12px;margin:-7px 0 14px}.field{margin:0 0 13px}label{display:block;font-size:12px;font-weight:700;margin-bottom:7px;color:#cbd0da}input,textarea{width:100%;background:#090a0e;color:var(--t);border:1px solid var(--l);border-radius:11px;padding:11px;outline:none}textarea{min-height:105px;resize:vertical;font:12px monospace}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.domains{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;gap:7px;align-items:center;border:1px solid var(--l);border-radius:10px;padding:9px;font-size:12px}.check input{width:auto}.drop{padding:26px;text-align:center;border:1px dashed #4a4f5d;border-radius:15px;background:#0a0b0f;cursor:pointer}.drop.drag{border-color:var(--a)}.drop span{display:block;color:var(--m);font-size:12px;margin-top:5px}.file{font-size:12px;color:#cdd1db;margin-top:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:11px;padding:11px 14px;font-weight:800;background:#252834;color:white;cursor:pointer}button.primary{background:linear-gradient(135deg,var(--a),#6d28d9)}button:disabled{opacity:.5}.status{margin-top:13px;border:1px solid var(--l);border-radius:11px;padding:10px;color:var(--m);font-size:12px}.bar{height:7px;background:#1c1f27;border-radius:9px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b))}.links{max-height:360px;overflow:auto;border:1px solid var(--l);border-radius:12px;background:#090a0e}.link{padding:8px 10px;border-bottom:1px solid #1d2028;font:11px monospace;word-break:break-all;color:#c5cad5}.empty{text-align:center;padding:28px;color:var(--m)}.pill{display:inline-block;padding:5px 8px;background:#191b24;border-radius:99px;font-size:11px;margin-right:5px}.note{font-size:11px;line-height:1.5}@media(max-width:760px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.row,.domains{grid-template-columns:1fr}}</style></head><body><div class="wrap"><div class="brand"><div class="logo">SF</div><div><h1>SVGForge</h1><p>Bulk SVG / HTML → GitHub repos → CDN links</p></div></div><div class="grid"><section class="card"><h2>GitHub targets</h2><p class="sub">One token per line. Tokens stay in this browser and are sent directly to GitHub.</p><div class="field"><label>GitHub tokens</label><textarea id="tokens" placeholder="github_pat_...&#10;github_pat_..."></textarea></div><div class="row"><div class="field"><label>Repos per token</label><input id="repos" type="number" min="1" value="1"></div><div class="field"><label>Files per repo</label><input id="files" type="number" min="1" value="10"></div></div><div class="row"><div class="field"><label>Repo name prefix</label><input id="rp" value="svgforge"></div><div class="field"><label>File name prefix</label><input id="fp" value="image"></div></div><div class="field"><label>Parallel repos</label><input id="parallel" type="number" min="1" value="2"></div><div class="note">No artificial maximum is imposed. GitHub rate limits, repo limits, and browser memory still apply.</div></section><section class="card"><h2>CDN domains</h2><p class="sub">Every selected domain creates a link for each file.</p><div class="domains" id="domains"></div><div class="actions"><button id="all">Select all</button><button id="reset">Reset</button></div></section><section class="card"><h2>SVG / HTML file</h2><div class="drop" id="drop"><b>Drop an SVG or HTML file here</b><span>or tap to choose a file</span><input id="fi" type="file" accept=".svg,.html,.htm,image/svg+xml,text/html" hidden></div><div class="file" id="fn">No SVG selected</div></section><section class="card"><h2>Publish</h2><span class="pill" id="est">0 links</span><span class="pill" id="acc">0 repos</span><div class="actions"><button class="primary" id="go">Publish & generate links</button><button id="copy">Copy all</button><button id="dl">Download .txt</button></div><div class="status" id="status">Ready.</div><div class="bar"><i id="bar"></i></div></section><section class="card wide"><h2>Generated links <span id="count">0</span></h2><div class="links" id="links"><div class="empty">Your CDN links will appear here.</div></div></section></div></div><script>const CDS=[
+ ['cdn.jsdelivr.net',x=>`https://cdn.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['fastly.jsdelivr.net',x=>`https://fastly.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['gcore.jsdelivr.net',x=>`https://gcore.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['quantil.jsdelivr.net',x=>`https://quantil.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['jsdelivr.b-cdn.net',x=>`https://jsdelivr.b-cdn.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['originfastly.jsdelivr.net',x=>`https://originfastly.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['testingcdn.jsdelivr.net',x=>`https://testingcdn.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['rawcdn.jsdelivr.net',x=>`https://rawcdn.jsdelivr.net/gh/${x.u}/${x.r}@${x.b}/${x.f}`],
+ ['cdn.statically.io',x=>`https://cdn.statically.io/gh/${x.u}/${x.r}/${x.b}/${x.f}`],
+ ['raw.githack.com',x=>`https://raw.githack.com/${x.u}/${x.r}/${x.b}/${x.f}`],
+ ['rawcdn.githack.com',x=>`https://rawcdn.githack.com/${x.u}/${x.r}/${x.b}/${x.f}`],
+ ['raw.githubusercontent.com',x=>`https://raw.githubusercontent.com/${x.u}/${x.r}/${x.b}/${x.f}`]
+];
+const $=id=>document.getElementById(id);
+const S={domains:new Set(['cdn.jsdelivr.net']),svg:null,links:[]};
+CDS.forEach(([n])=>{
+ const l=document.createElement('label'); l.className='check';
+ l.innerHTML=`<input type="checkbox" data-d="${n}" ${S.domains.has(n)?'checked':''}> ${n}`;
+ l.querySelector('input').onchange=e=>{e.target.checked?S.domains.add(n):S.domains.delete(n);update()};
+ $('domains').append(l);
+});
+$('all').onclick=()=>{document.querySelectorAll('[data-d]').forEach(x=>{x.checked=true;S.domains.add(x.dataset.d)});update()};
+$('reset').onclick=()=>{document.querySelectorAll('[data-d]').forEach(x=>{x.checked=false;S.domains.delete(x.dataset.d)});update()};
+function nums(){return{r:Math.max(1,parseInt($('repos').value)||1),f:Math.max(1,parseInt($('files').value)||1),p:Math.max(1,parseInt($('parallel').value)||1)}}
+function update(){const n=nums(),t=$('tokens').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);$('est').textContent=(t.length*n.r*n.f*S.domains.size).toLocaleString()+' links';$('acc').textContent=(t.length*n.r).toLocaleString()+' repos'}
+['tokens','repos','files','parallel'].forEach(x=>$(x).oninput=update);
+$('drop').onclick=e=>{if(e.target.id!=='fi')$('fi').click()};
+$('fi').onchange=e=>setFile(e.target.files[0]);
+['dragenter','dragover'].forEach(x=>$('drop').addEventListener(x,e=>{e.preventDefault();$('drop').classList.add('drag')}));
+['dragleave','drop'].forEach(x=>$('drop').addEventListener(x,e=>{e.preventDefault();$('drop').classList.remove('drag')}));
+$('drop').ondrop=e=>setFile(e.dataTransfer.files[0]);
+function setFile(f){if(!f)return;const ext=f.name.toLowerCase().split('.').pop();if(!['svg','html','htm'].includes(ext))return alert('Please choose an SVG or HTML file.');S.svg=f;$('fn').textContent=f.name}
+async function api(t,u,o={}){const r=await fetch(u,{...o,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+t,'X-GitHub-Api-Version':'2026-03-10','Content-Type':'application/json',...(o.headers||{})}});if(!r.ok)throw Error(r.status+' '+(await r.text()).slice(0,250));return r.json()}
+function b64(s){const a=new TextEncoder().encode(s);let z='';for(let i=0;i<a.length;i+=32768)z+=String.fromCharCode(...a.subarray(i,i+32768));return btoa(z)}
+async function create(t,n){return api(t,'https://api.github.com/user/repos',{method:'POST',body:JSON.stringify({name:n,description:'Generated by SVGForge',private:false,auto_init:true,has_issues:false,has_projects:false,has_wiki:false})})}
+async function upload(t,u,r,b,f,c){return api(t,`https://api.github.com/repos/${encodeURIComponent(u)}/${encodeURIComponent(r)}/contents/${encodeURIComponent(f)}`,{method:'PUT',body:JSON.stringify({message:'Add '+f,content:c,branch:b})})}
+function render(){
+ $('count').textContent=S.links.length.toLocaleString();
+ if(!S.links.length){$('links').innerHTML='<div class="empty">Your CDN links will appear here.</div>';return}
+ $('links').innerHTML=S.links.slice(0,1000).map(x=>'<div class="link">'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>').join('')+(S.links.length>1000?'<div class="empty">Showing first 1,000. Copy/download contains all links.</div>':'');
+}
+async function run(){
+ const ts=$('tokens').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),n=nums();
+ if(!ts.length)return alert('Add at least one GitHub token.');
+ if(!S.svg)return alert('Choose an SVG first.');
+ if(!S.domains.size)return alert('Select at least one CDN domain.');
+ $('go').disabled=true;S.links=[];render();$('bar').style.width='0%';
+ try{
+  const content=b64(await S.svg.text()),jobs=[];
+  for(let ti=0;ti<ts.length;ti++){
+   const u=await api(ts[ti],'https://api.github.com/user');
+   for(let ri=1;ri<=n.r;ri++)jobs.push({t:ts[ti],u:u.login,i:ti+1,ri});
+  }
+  let done=0;
+  async function worker(){
+   while(jobs.length){
+    const j=jobs.shift();
+    const repo=await create(j.t,`${$('rp').value.trim()||'svgforge'}-${j.i}-${j.ri}-${Date.now()}`);
+    const b=repo.default_branch||'main';
+    for(let f=1;f<=n.f;f++){
+     const ext=(S.svg.name.toLowerCase().split('.').pop()==='htm'?'html':S.svg.name.toLowerCase().split('.').pop()); const file=`${$('fp').value.trim()||'image'}-${f}.${ext}`;
+     await upload(j.t,j.u,repo.name,b,file,content);
+     for(const [d,fn] of CDS)if(S.domains.has(d))S.links.push(fn({u:j.u,r:repo.name,b,f:file}));
+     done++;$('status').textContent=`Uploading… ${done.toLocaleString()} / ${(ts.length*n.r*n.f).toLocaleString()}`;$('bar').style.width=(done/(ts.length*n.r*n.f)*100)+'%';render();
+    }
+   }
+  }
+  await Promise.all(Array.from({length:Math.min(n.p,jobs.length)},worker));
+  $('status').textContent=`Done — ${S.links.length.toLocaleString()} links generated.`;
+ }catch(e){$('status').textContent='Error: '+e.message;alert(e.message)}finally{$('go').disabled=false}
+}
+$('go').onclick=run;
+$('copy').onclick=async()=>{if(S.links.length){await navigator.clipboard.writeText(S.links.join('\n'));$('status').textContent='Copied all links.'}};
+$('dl').onclick=()=>{if(S.links.length){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([S.links.join('\n')],{type:'text/plain'}));a.download='svgforge-links.txt';a.click()}};
+update();
+</script></body></html>
